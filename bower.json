@@ -1,0 +1,23 @@
+{
+  "name": "ngCantidad",
+  "version": "0.0.1",
+  "authors": [
+    "Jose Mussa <jose.mussa@gmail.com>"
+  ],
+  "description": "Convierte cantidades numericas a letra",
+  "main": "cantidad.js",
+  "keywords": [
+    "cantidad",
+    "numerica",
+    "letra"
+  ],
+  "license": "MIT",
+  "homepage": "http://github.com/josemussa/ngcantidad",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
