@@ -150,9 +150,7 @@
         letrasMonedaSingular: monedasingular,
         abreviacion: monedaabreviacion
       };
-      if (data.centavos > 0)
-        data.letrasCentavos = data.centavos + "/100";
-
+      data.letrasCentavos = data.centavos + "/100";
       if(data.enteros == 0)
         return "cero " + data.letrasMonedaPlural + " " + data.letrasCentavos + " "+ monedaabreviacion;
       if (data.enteros == 1)
