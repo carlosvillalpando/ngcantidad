@@ -160,7 +160,7 @@
       else
         return Millones(data.enteros) + " " + data.letrasMonedaPlural + " " + data.letrasCentavos + " "+ monedaabreviacion;
     }
-    return NumeroALetras(201000.01);
+    return NumeroALetras(num);
    }
   });
 }).call(this);
