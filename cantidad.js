@@ -1,51 +1,166 @@
 (function() {
   angular.module('ngcantidad', []);
   angular.module('ngcantidad').filter("cantidad", function() {
-    return function(n,con,currency) {
-      if (n !== void 0) {
-      var o=new Array("diez", "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete", "dieciocho", "diecinueve", "veinte", "veintiuno", "veintidós", "veintitrés", "veinticuatro", "veinticinco", "veintiséis", "veintisiete", "veintiocho", "veintinueve");
-      var u=new Array("cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve");
-      var d=new Array("", "", "", "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa");
-      var c=new Array("", "ciento", "doscientos", "trescientos", "cuatrocientos", "quinientos", "seiscientos", "setecientos", "ochocientos", "novecientos");
+   return function(num,monedaplural,monedasingular,monedaabreviacion){
+    monedaabreviacion = monedaabreviacion ? monedaabreviacion : "";
+    monedaplural = monedaplural ? monedaplural : "";
+    monedasingular = monedasingular ? monedasingular : "";
 
-      var n=parseFloat(n).toFixed(2); /*se limita a dos decimales, no sabía que existía toFixed() :)*/
-      var p=n.toString().substring(n.toString().indexOf(".")+1); /*decimales*/
-      var m=n.toString().substring(0,n.toString().indexOf(".")); /*número sin decimales*/
-      var m=parseFloat(m).toString().split("").reverse(); /*tampoco que reverse() existía :D*/
-      var t="";
+    function Unidades(num){
 
-      /*Se analiza cada 3 dígitos*/
-      for (var i=0; i<m.length; i+=3)
+      switch(num)
       {
-        var x=t;
-        /*formamos un número de 2 dígitos*/
-        var b=m[i+1]!=undefined?parseFloat(m[i+1].toString()+m[i].toString()):parseFloat(m[i].toString());
-        /*analizamos el 3 dígito*/
-        t=m[i+2]!=undefined?(c[m[i+2]]+" "):"";
-        t+=b<10?u[b]:(b<30?o[b-10]:(d[m[i+1]]+(m[i]=='0'?"":(" y "+u[m[i]]))));
-        t=t=="ciento cero"?"cien":t;
-        if (2<i&&i<6)
-        t=t=="uno"?"mil ":(t.replace("uno","un")+" mil ");
-        if (5<i&&i<9)
-        t=t=="uno"?"un millón ":(t.replace("uno","un")+" millones ");
-        t+=x;
-        //t=i<3?t:(i<6?((t=="uno"?"mil ":(t+" mil "))+x):((t=="uno"?"un millón ":(t+" millones "))+x));
+        case 1: return "un";
+        case 2: return "dos";
+        case 3: return "tres";
+        case 4: return "cuatro";
+        case 5: return "cinco";
+        case 6: return "seis";
+        case 7: return "siete";
+        case 8: return "ocho";
+        case 9: return "nuevo";
       }
 
-      
-      if(con && currency){
-        t+= " "+con+" "+p+"/100 "+ currency;
-      }else{
-        t+=" con "+p+"/100";
+      return "";
+    }
+
+    function Decenas(num){
+
+      decena = Math.floor(num/10);
+      unidad = num - (decena * 10);
+
+      switch(decena)
+      {
+        case 1:   
+          switch(unidad)
+          {
+            case 0: return "diez";
+            case 1: return "once";
+            case 2: return "doce";
+            case 3: return "trece";
+            case 4: return "catorce";
+            case 5: return "quince";
+            default: return "dieci" + Unidades(unidad);
+          }
+        case 2:
+          switch(unidad)
+          {
+            case 0: return "veinte";
+            default: return "veinti" + Unidades(unidad);
+          }
+        case 3: return DecenasY("TREINTA", unidad);
+        case 4: return DecenasY("CUARENTA", unidad);
+        case 5: return DecenasY("CINCUENTA", unidad);
+        case 6: return DecenasY("SESENTA", unidad);
+        case 7: return DecenasY("SETENTA", unidad);
+        case 8: return DecenasY("OCHENTA", unidad);
+        case 9: return DecenasY("NOVENTA", unidad);
+        case 0: return Unidades(unidad);
       }
-      /*correcciones*/
-      t=t.replace("  "," ");
-      t=t.replace(" cero","");
-      //t=t.replace("ciento y","cien y");
-      //alert("Numero: "+n+"\nNº Dígitos: "+m.length+"\nDígitos: "+m+"\nDecimales: "+p+"\nt: "+t);
-      //document.getElementById("esc").value=t;
-      return t;
+    }//Unidades()
+
+    function DecenasY(strSin, numUnidades){
+      if (numUnidades > 0)
+        return strSin + " Y " + Unidades(numUnidades)
+
+      return strSin;
+    }//DecenasY()
+
+    function Centenas(num){
+
+      centenas = Math.floor(num / 100);
+      decenas = num - (centenas * 100);
+
+      switch(centenas)
+      {
+        case 1:
+          if (decenas > 0)
+            return "ciento " + Decenas(decenas);
+          return "cien";
+        case 2: return "doscientos " + Decenas(decenas);
+        case 3: return "trescientos " + Decenas(decenas);
+        case 4: return "cuatrocientos " + Decenas(decenas);
+        case 5: return "quinientos " + Decenas(decenas);
+        case 6: return "seiscientos " + Decenas(decenas);
+        case 7: return "setecientos " + Decenas(decenas);
+        case 8: return "ochocientos " + Decenas(decenas);
+        case 9: return "novecientos " + Decenas(decenas);
       }
-    };
+
+      return Decenas(decenas);
+    }//Centenas()
+
+    function Seccion(num, divisor, strSingular, strPlural){
+      cientos = Math.floor(num / divisor)
+      resto = num - (cientos * divisor)
+
+      letras = "";
+
+      if (cientos > 0)
+        if (cientos > 1)
+          letras = Centenas(cientos) + " " + strPlural;
+        else
+          letras = strSingular;
+
+      if (resto > 0)
+        letras += "";
+
+      return letras;
+    }//Seccion()
+
+    function Miles(num){
+      divisor = 1000;
+      cientos = Math.floor(num / divisor)
+      resto = num - (cientos * divisor)
+
+      strMiles = Seccion(num, divisor, "un mil", "mil");
+      strCentenas = Centenas(resto);
+
+      if(strMiles == "")
+        return strCentenas;
+
+      return strMiles + " " + strCentenas;
+
+      //return Seccion(num, divisor, "UN MIL", "MIL") + " " + Centenas(resto);
+    }//Miles()
+
+    function Millones(num){
+      divisor = 1000000;
+      cientos = Math.floor(num / divisor)
+      resto = num - (cientos * divisor)
+
+      strMillones = Seccion(num, divisor, "un millon", "millones");
+      strMiles = Miles(resto);
+
+      if(strMillones == "")
+        return strMiles;
+
+      return strMillones + " " + strMiles;
+
+      //return Seccion(num, divisor, "UN MILLON", "MILLONES") + " " + Miles(resto);
+    }//Millones()
+
+    function NumeroALetras(num){
+      var data = {
+        numero: num,
+        enteros: Math.floor(num),
+        centavos: (((Math.round(num * 100)) - (Math.floor(num) * 100))),
+        letrasCentavos: "",
+        letrasMonedaPlural: monedaplural,
+        letrasMonedaSingular: monedasingular,
+        abreviacion: monedaabreviacion
+      };
+      if (data.centavos > 0)
+        data.letrasCentavos = data.centavos + "/100";
+
+      if(data.enteros == 0)
+        return "cero " + data.letrasMonedaPlural + " " + data.letrasCentavos + " "+ monedaabreviacion;
+      if (data.enteros == 1)
+        return Millones(data.enteros) + " " + data.letrasMonedaSingular + " " + data.letrasCentavos + " "+ monedaabreviacion;
+      else
+        return Millones(data.enteros) + " " + data.letrasMonedaPlural + " " + data.letrasCentavos + " "+ monedaabreviacion;
+    }
+    return NumeroALetras(201000.01);
+   }
   });
 }).call(this);
