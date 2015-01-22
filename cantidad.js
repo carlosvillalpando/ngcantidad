@@ -1,7 +1,7 @@
 (function() {
   angular.module('ngcantidad', []);
   angular.module('ngcantidad').filter("cantidad", function() {
-    return function(n) {
+    return function(n,con,currency) {
       if (n !== void 0) {
       var o=new Array("diez", "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete", "dieciocho", "diecinueve", "veinte", "veintiuno", "veintidós", "veintitrés", "veinticuatro", "veinticinco", "veintiséis", "veintisiete", "veintiocho", "veintinueve");
       var u=new Array("cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve");
@@ -32,7 +32,12 @@
         //t=i<3?t:(i<6?((t=="uno"?"mil ":(t+" mil "))+x):((t=="uno"?"un millón ":(t+" millones "))+x));
       }
 
-      t+=" con "+p+"/100";
+      
+      if(con && currency){
+        t+= " "+con+" "+p+"/100 "+ currency;
+      }else{
+        t+=" con "+p+"/100";
+      }
       /*correcciones*/
       t=t.replace("  "," ");
       t=t.replace(" cero","");
